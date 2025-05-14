@@ -4,11 +4,19 @@ import { StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
 
 import { useColorScheme } from "@/components/useColorScheme";
 import { View } from "@/components/Themed";
+import { API } from "../api";
 
 export default function signUp() {
-  function toSignIn() {
-    router.back();
-  }
+  const handleSignUp = async () => {
+    try {
+      const aa = await API.post("/auth/signup", { user, password });
+      console.log("User created successfully");
+    } catch (error) {
+      alert("Não foi possível cadastrar este usuário.");
+      console.log(error);
+    }
+  };
+
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const colorScheme = useColorScheme();
@@ -30,7 +38,7 @@ export default function signUp() {
         value={password}
         onChangeText={setPassword}
       />
-      <TouchableOpacity style={styles.button} onPress={toSignIn}>
+      <TouchableOpacity style={styles.button} onPress={() => handleSignUp()}>
         <Text style={styles.label}>Criar {user}</Text>
       </TouchableOpacity>
     </View>

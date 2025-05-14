@@ -4,11 +4,19 @@ import { StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
 
 import { useColorScheme } from "@/components/useColorScheme";
 import { View } from "@/components/Themed";
+import { API } from "../api";
 
 export default function Index() {
-  function signIn() {
-    router.navigate("/(tabs)/home");
-  }
+  const handleSignIn = async () => {
+    try {
+      const response = await API.post("/auth/signin", { user, password });
+      console.log("Token:", response.data.access_token);
+      // Store token securely (e.g., AsyncStorage)
+    } catch (error) {
+      alert("Login Inválido.");
+      console.log(error);
+    }
+  };
   function signUp() {
     router.navigate("/signUp");
   }
@@ -35,7 +43,7 @@ export default function Index() {
         onChangeText={setPassword}
       />
       <View style={styles.buttonSet}>
-        <TouchableOpacity style={styles.button} onPress={signIn}>
+        <TouchableOpacity style={styles.button} onPress={handleSignIn}>
           <Text style={styles.label}>Entrar</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={signUp}>
