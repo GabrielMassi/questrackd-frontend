@@ -9,7 +9,7 @@ import { API } from "../api";
 export default function signUp() {
   const handleSignUp = async () => {
     try {
-      const aa = await API.post("/auth/signup", { user, password });
+      const aa = await API.post("/auth/signup", { username, password });
       console.log("User created successfully");
     } catch (error) {
       alert("Não foi possível cadastrar este usuário.");
@@ -17,7 +17,7 @@ export default function signUp() {
     }
   };
 
-  const [user, setUser] = useState("");
+  const [username, setUser] = useState("");
   const [password, setPassword] = useState("");
   const colorScheme = useColorScheme();
 
@@ -28,7 +28,7 @@ export default function signUp() {
         style={styles.input}
         placeholder="Usuário"
         maxLength={16}
-        value={user}
+        value={username}
         onChangeText={setUser}
       />
       <TextInput
@@ -39,7 +39,7 @@ export default function signUp() {
         onChangeText={setPassword}
       />
       <TouchableOpacity style={styles.button} onPress={() => handleSignUp()}>
-        <Text style={styles.label}>Criar {user}</Text>
+        <Text style={styles.label}>Criar {username}</Text>
       </TouchableOpacity>
     </View>
   );

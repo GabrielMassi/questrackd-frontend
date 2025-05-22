@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const API = axios.create({
-  baseURL: "http://localhost:3000/api", // Replace with your computer's IP
+  baseURL: "http://arthurtv.duckdns.org:9998/api", // Replace with your computer's IP
 });
 
 export default API;
