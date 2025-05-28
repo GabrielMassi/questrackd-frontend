@@ -9,9 +9,10 @@ import { API } from "../api";
 export default function Index() {
   const handleSignIn = async () => {
     try {
-      const response = await API.post("/auth/signin", { user, password });
+      const response = await API.post("/auth/signin", { username, password });
       console.log("Token:", response.data.access_token);
-      // Store token securely (e.g., AsyncStorage)
+      // Store token securely
+      router.navigate("/(tabs)/home");
     } catch (error) {
       alert("Login Inválido.");
       console.log(error);
@@ -20,7 +21,7 @@ export default function Index() {
   function signUp() {
     router.navigate("/signUp");
   }
-  const [user, setUser] = useState("");
+  const [username, setUser] = useState("");
   const [password, setPassword] = useState("");
   const colorScheme = useColorScheme();
 
@@ -32,7 +33,7 @@ export default function Index() {
         style={styles.input}
         placeholder="Usuário"
         maxLength={16}
-        value={user}
+        value={username}
         onChangeText={setUser}
       />
       <TextInput

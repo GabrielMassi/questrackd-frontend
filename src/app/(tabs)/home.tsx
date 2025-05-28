@@ -22,15 +22,15 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "flex-start",
+    padding: 16,
   },
   title: {
     alignSelf: "auto",
     fontSize: 20,
     fontWeight: "bold",
-    padding: 16,
   },
   separator: {
-    marginVertical: 10,
+    marginVertical: 30,
     height: 1,
     width: "80%",
   },

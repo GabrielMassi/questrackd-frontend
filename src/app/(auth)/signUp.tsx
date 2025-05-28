@@ -11,8 +11,10 @@ export default function signUp() {
     try {
       const aa = await API.post("/auth/signup", { username, password });
       console.log("User created successfully");
+      alert("Usuário criado com sucesso!");
+      router.back();
     } catch (error) {
-      alert("Não foi possível cadastrar este usuário.");
+      alert("Esse usuário já existe.");
       console.log(error);
     }
   };
