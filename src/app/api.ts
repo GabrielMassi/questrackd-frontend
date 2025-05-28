@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const API = axios.create({
-  baseURL: "http://192.168.1.65:3000/api",
-  //baseURL: "http://arthurtv.duckdns.org:9998/api",
+  //baseURL: "http://MEU-IP:3000/api", //Rodando localmente (dev)
+  baseURL: "http://arthurtv.duckdns.org:9998/api", //Produção
 });
 
 export default API;
