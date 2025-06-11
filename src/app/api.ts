@@ -3,8 +3,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 
 export const API = axios.create({
-  baseURL: "http://192.168.1.65:3000/api", //Rodando localmente (dev)
-  //baseURL: "http://arthurtv.duckdns.org:9002/api", //Produção
+  //baseURL: "http://aaaa:3000/api", //Rodando localmente (dev)
+  baseURL: "http://arthurtv.duckdns.org:9002/api", //Produção
 });
 
 API.interceptors.request.use(
