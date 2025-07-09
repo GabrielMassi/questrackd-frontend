@@ -1,11 +1,20 @@
 import { useLocalSearchParams } from "expo-router";
 import { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, TextInput, Button } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TextInput,
+  Button,
+  KeyboardAvoidingView,
+} from "react-native";
 import StarRating from "react-native-star-rating-widget";
 import { ScrollView } from "react-native";
 import { AuthContext } from "../AuthContext";
 import API from "../api";
 import { useUsername } from "../hooks/useStorage";
+import { Picker } from "@react-native-picker/picker";
 
 export default function GamePage() {
   const { id, name, coverUrl, summary, username } = useLocalSearchParams<{
@@ -16,14 +25,12 @@ export default function GamePage() {
     username: string;
   }>();
 
-  console.log(username);
-
   const handleRatingChange = async (newRating: number) => {
     setRating(newRating);
     try {
       await API.post("/ratings", {
         gameId: id,
-        usernamename: username,
+        username: username,
         rating: newRating,
       });
       console.log("alo?");
@@ -36,13 +43,26 @@ export default function GamePage() {
     try {
       await API.post("/ratings", {
         gameId: id,
-        usernamename: username,
+        username: username,
         review,
       });
       console.log("alo?");
       alert("Review submitted!");
     } catch (error) {
       alert("Failed to submit review");
+      console.error(error);
+    }
+  };
+
+  const handlePicker = async (gameId: string, opt: string) => {
+    try {
+      await API.post("/shelf", {
+        username: username,
+        gameId: gameId,
+        shelfType: opt,
+      });
+    } catch (error) {
+      alert("Failed to add game to a shelf");
       console.error(error);
     }
   };
@@ -55,6 +75,8 @@ export default function GamePage() {
 
   const [review, setReview] = useState("");
 
+  const [selectedValue, setSelectedValue] = useState("option1");
+
   useEffect(() => {
     const loadusernameRating = async () => {
       try {
@@ -62,7 +84,7 @@ export default function GamePage() {
         const response = await API.get(`/ratings/${id}/${username}`, {
           params: {
             gameId: id,
-            usernamename: username,
+            username: username,
           },
         });
         if (response.data) {
@@ -78,44 +100,83 @@ export default function GamePage() {
   }, [id]);
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        padding: 20,
-        backgroundColor: "#222",
-      }}
-    >
-      {fullImageUrl && (
-        <Image source={{ uri: fullImageUrl }} style={styles.image} />
-      )}
-
-      <Text style={styles.title}>{name}</Text>
-
-      <Text style={styles.summary}>{summary}</Text>
-
-      <View style={styles.ratingContainer}>
-        <Text style={styles.ratingLabel}>Rate this game:</Text>
-        <StarRating
-          rating={rating}
-          onChange={handleRatingChange}
-          starSize={28}
+    <KeyboardAvoidingView behavior="height">
+      <ScrollView
+        contentContainerStyle={{
+          padding: 20,
+          backgroundColor: "#222",
+          paddingBottom: 50,
+        }}
+      >
+        {fullImageUrl && (
+          <Image source={{ uri: fullImageUrl }} style={styles.image} />
+        )}
+        <Text style={styles.title}>{name}</Text>
+        <Text style={styles.summary}>{summary}</Text>
+        <View style={styles.ratingContainer}>
+          <Text style={styles.label}>Rate this game:</Text>
+          <StarRating
+            rating={rating}
+            onChange={handleRatingChange}
+            starSize={28}
+          />
+        </View>
+        <Text style={styles.label}>Your Review:</Text>
+        <TextInput
+          multiline
+          numberOfLines={4}
+          style={styles.reviewInput}
+          onChangeText={setReview}
+          value={review}
+          placeholder="Deixe sua review..."
         />
-      </View>
-
-      <Text style={styles.reviewLabel}>Your Review:</Text>
-      <TextInput
-        multiline
-        numberOfLines={4}
-        style={styles.reviewInput}
-        onChangeText={setReview}
-        value={review}
-        placeholder="Deixe sua review..."
-      />
-      <Button
-        title="Submit Review"
-        onPress={submitReview}
-        disabled={!review.trim()}
-      />
-    </ScrollView>
+        <Button
+          title="Submit Review"
+          onPress={submitReview}
+          disabled={!review.trim()}
+        />
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedValue}
+            onValueChange={(itemValue) => {
+              if (itemValue !== "neutral") {
+                setSelectedValue(itemValue);
+                handlePicker(id, itemValue);
+                setSelectedValue("neutral");
+              }
+            }}
+            style={styles.picker}
+            dropdownIconColor="#fff"
+          >
+            <Picker.Item
+              label="Add to shelf..."
+              value="neutral"
+              style={styles.neutralItem}
+            />
+            <Picker.Item
+              label="⭐ Favorite"
+              value="favorite"
+              style={styles.pickerItem}
+            />
+            <Picker.Item
+              label="🎮 Playing"
+              value="playing"
+              style={styles.pickerItem}
+            />
+            <Picker.Item
+              label="✅ Played"
+              value="played"
+              style={styles.pickerItem}
+            />
+            <Picker.Item
+              label="📝 Wishlist"
+              value="wishlist"
+              style={styles.pickerItem}
+            />
+          </Picker>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -123,6 +184,7 @@ const styles = StyleSheet.create({
   scrollContainer: {
     padding: 20,
     backgroundColor: "#222",
+    paddingBottom: 50,
   },
   image: {
     width: "100%",
@@ -149,12 +211,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     alignItems: "center",
   },
-  ratingLabel: {
-    fontSize: 18,
-    color: "#fff",
-    marginBottom: 10,
-  },
-  reviewLabel: {
+  label: {
     fontSize: 18,
     color: "#fff",
     marginBottom: 10,
@@ -170,5 +227,28 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     marginBottom: 20,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#444",
+    borderRadius: 8,
+    backgroundColor: "#333",
+    overflow: "hidden",
+    marginVertical: 10,
+  },
+  picker: {
+    color: "#fff",
+    height: 50,
+    paddingHorizontal: 15,
+  },
+  pickerItem: {
+    color: "#fff",
+    backgroundColor: "#333",
+    fontSize: 16,
+  },
+  neutralItem: {
+    backgroundColor: "#333",
+    color: "#aaa",
+    fontStyle: "italic",
   },
 });
